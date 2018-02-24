@@ -173,9 +173,9 @@ hello.yml                     test.json
 
 So while there are many other files in the CWD it only shows me subdirs and those with valid extensions.
 
-# Specify custom flag completion
+# Specifiy custom flag completion
 
-Similar to the filename completion and filtering using cobra.BashCompFilenameExt, you can specify
+Similar to the filename completion and filtering using cobra.BashCompFilenameExt, you can specifiy
 a custom flag completion function with cobra.BashCompCustom:
 
 ```go
@@ -203,18 +203,4 @@ __kubectl_get_namespaces()
         COMPREPLY=( $( compgen -W "${kubectl_out}[*]" -- "$cur" ) )
     fi
 }
-```
-# Using bash aliases for commands
-
-You can also configure the `bash aliases` for the commands and they will also support completions.
-
-```bash
-alias aliasname=origcommand
-complete -o default -F __start_origcommand aliasname
-
-# and now when you run `aliasname` completion will make
-# suggestions as it did for `origcommand`.
-
-$) aliasname <tab><tab>
-completion     firstcommand   secondcommand
 ```
