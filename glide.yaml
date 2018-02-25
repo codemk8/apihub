@@ -1,2 +1,16 @@
 package: github.com/codemk8/apihub
-import: []
+import:
+- package: github.com/mitchellh/go-homedir
+- package: github.com/spf13/cobra
+  version: ^0.0.1
+- package: github.com/spf13/viper
+  version: ^1.0.0
+- package: k8s.io/apimachinery
+  subpackages:
+  - pkg/api/errors
+  - pkg/apis/meta/v1
+- package: k8s.io/client-go
+  version: ^6.0.0
+  subpackages:
+  - kubernetes
+  - tools/clientcmd

@@ -18,34 +18,34 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+
+	"github.com/codemk8/apihub/pkg/k8s"
 )
 
-// initCmd represents the init command
-var initCmd = &cobra.Command{
-	Use:   "init",
-	Short: "Set up the initial infrastructure to run apihub",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+// checkCmd represents the check command
+var checkCmd = &cobra.Command{
+	Use:   "check",
+	Short: "Check prerequisites: k8s cluster, tiller service etc.",
+	Long: `This is the first command to run to check if you have a valid k8s cluster running.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-
+It normally should work if you can run "kubectl" on your command line. 
+It also checks other dependencies such as a tiller service`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("init called")
+		k8s.CheckK8s()
+		fmt.Println("check called")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(checkCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// initCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// checkCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// initCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// checkCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
