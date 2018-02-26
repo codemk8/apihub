@@ -19,6 +19,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/codemk8/apihub/pkg/helm"
 	"github.com/codemk8/apihub/pkg/k8s"
 )
 
@@ -32,6 +33,8 @@ It normally should work if you can run "kubectl" on your command line.
 It also checks other dependencies such as a tiller service`,
 	Run: func(cmd *cobra.Command, args []string) {
 		k8s.CheckK8s()
+		helm.ListRelease()
+		helm.Repo("list")
 		fmt.Println("check called")
 	},
 }

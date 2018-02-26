@@ -23,9 +23,11 @@ import (
 )
 
 // destroyCmd represents the destroy command
+// TODO less destructive behavior by default
+// add purge option for complete destruction
 var destroyCmd = &cobra.Command{
 	Use:   "destroy",
-	Short: "A brief description of your command",
+	Short: "Destroy everything",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
