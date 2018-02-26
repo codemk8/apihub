@@ -87,12 +87,10 @@ func AddPV() error {
 		return err
 	}
 
-	pv, err := k8sClient.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
-	if err != nil {
-		log.Printf("Error getting PV %v", err)
-	}
+	_, err = k8sClient.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
 	// if found, no need to create the PV
-	if pv != nil {
+	if err == nil {
+		log.Printf("Found existing PV %s, skip creating...", pvName)
 		return nil
 	}
 	storageQuantity, _ := resource.ParseQuantity(pvCapacity)
@@ -102,7 +100,7 @@ func AddPV() error {
 		return err
 	}
 
-	k8sexpVolume := &api.PersistentVolume{
+	apihubVolume := &api.PersistentVolume{
 		TypeMeta: metav1.TypeMeta{Kind: "PersistentVolume",
 			APIVersion: "v1"},
 		ObjectMeta: metav1.ObjectMeta{
@@ -125,9 +123,28 @@ func AddPV() error {
 		},
 		Status: api.PersistentVolumeStatus{},
 	}
-	_, err = k8sClient.CoreV1().PersistentVolumes().Create(k8sexpVolume)
+	log.Print("Creating pv\n")
+	_, err = k8sClient.CoreV1().PersistentVolumes().Create(apihubVolume)
 	if err != nil {
 		log.Print(err.Error())
 	}
 	return nil
+}
+
+// DestroyPV deletes the persistent volumes created by apihub
+func DestroyPV() error {
+	k8sClient, err := NewK8sClient()
+	if err != nil {
+		return err
+	}
+
+	pv, _ := k8sClient.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
+	// if found, no need to create the PV
+	if pv != nil {
+		err = k8sClient.CoreV1().PersistentVolumes().Delete(pvName, &metav1.DeleteOptions{})
+		if err != nil {
+			log.Printf("Error deleting PV %v", err)
+		}
+	}
+	return err
 }

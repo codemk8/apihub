@@ -14,5 +14,7 @@
 .glide/
 bin/
 
+debug.test
 debug
+
 

@@ -23,5 +23,11 @@ func TestCreatePV(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error creating PV %v.", err)
 	}
+}
 
+func TestDestroyPV(t *testing.T) {
+	err := DestroyPV()
+	if err != nil {
+		t.Errorf("Error destroy PV %v.", err)
+	}
 }
