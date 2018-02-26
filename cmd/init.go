@@ -18,6 +18,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+
+	"github.com/codemk8/apihub/pkg/k8s"
 )
 
 // initCmd represents the init command
@@ -32,6 +34,8 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
+		// A list of infrastructure setups
+		k8s.AddPV() // Persistent Volumes
 		fmt.Println("init called")
 	},
 }
