@@ -28,3 +28,14 @@ func Repo(subcmd string) error {
 	fmt.Printf("%s\n", stdoutStderr)
 	return err
 }
+
+// Install runs "helm install ..." command
+func Install(chartName string) error {
+	cmd := exec.Command("helm", "install", chartName)
+	stdoutStderr, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%s\n", stdoutStderr)
+	return err
+}

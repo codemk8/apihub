@@ -19,6 +19,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/codemk8/apihub/pkg/helm"
 	"github.com/codemk8/apihub/pkg/k8s"
 )
 
@@ -35,8 +36,14 @@ to quickly create a Cobra application.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
 		// A list of infrastructure setups
+
+		// Persistent volumes
 		k8s.AddPV() // Persistent Volumes
-		fmt.Println("init called")
+
+		// Deploy kong API gateway
+		helm.Install("stable/kong")
+
+		fmt.Println("init Done")
 	},
 }
 
