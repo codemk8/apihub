@@ -10,3 +10,18 @@ func TestNewK8sClient(t *testing.T) {
 		t.Errorf("Error creating k8sclient %v.", err)
 	}
 }
+
+func TestInitialCheck(t *testing.T) {
+	err := CheckK8s()
+	if err != nil {
+		t.Errorf("Error initial checking cluster %v.", err)
+	}
+}
+
+func TestCreatePV(t *testing.T) {
+	err := AddPV()
+	if err != nil {
+		t.Errorf("Error creating PV %v.", err)
+	}
+
+}

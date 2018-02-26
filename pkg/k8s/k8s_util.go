@@ -1,7 +1,6 @@
 package k8s
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -18,12 +17,12 @@ const (
 	tillerNs      = "kube-system"
 	tillerSvcName = "tiller-deploy"
 	// persistent volume
-	namespace = "default"
-	pvName    = "apihub-infra"
+	pvNamespace = "default"
+	pvName      = "apihub-infra"
 )
 
 const (
-	pvCapacity = "1Gi"
+	pvCapacity = "2Gi"
 )
 
 // MakeHostDirForPv makes a directory for hostPath PV
@@ -35,13 +34,8 @@ func MakeHostDirForPv(pvName string) (string, error) {
 	return path, err
 }
 
-// K8sClient is reused in every session
-type K8sClient struct {
-	clientset *kubernetes.Clientset
-}
-
 // NewK8sClient create the K8sClient
-func NewK8sClient() (*K8sClient, error) {
+func NewK8sClient() (*kubernetes.Clientset, error) {
 	home, err := homedir.Dir()
 	if err != nil {
 		log.Print(err.Error())
@@ -56,15 +50,12 @@ func NewK8sClient() (*K8sClient, error) {
 		return nil, err
 	}
 
-	var ks K8sClient
 	// create the clientset
 	cs, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		log.Print(err.Error())
-		return nil, err
 	}
-	ks.clientset = cs
-	return &ks, nil
+	return cs, err
 }
 
 // CheckK8s does basic checkings
@@ -74,15 +65,14 @@ func CheckK8s() error {
 		log.Print(err.Error())
 		return err
 	}
-	pods, err := k8sClient.clientset.CoreV1().Pods("").List(metav1.ListOptions{})
+	pods, err := k8sClient.CoreV1().Pods("").List(metav1.ListOptions{})
 	if err != nil {
 		log.Print(err.Error())
 		return err
 	}
-	_, err = k8sClient.clientset.CoreV1().Services("").Get(tillerSvcName, metav1.GetOptions{})
+	_, err = k8sClient.CoreV1().Services(tillerNs).Get(tillerSvcName, metav1.GetOptions{})
 	if err != nil {
-		log.Printf("Could not find service %s, check helm installation.\n", tillerSvcName)
-		log.Print(err.Error())
+		log.Printf("Could not find service %s, check helm installation, error %v\n", tillerSvcName, err)
 		return err
 	}
 
@@ -90,33 +80,38 @@ func CheckK8s() error {
 	return nil
 }
 
-// func getNamespace(ns: string) {
-//
-//}
-//
+// AddPV adds necessary persistent volumes for apihub
 func AddPV() error {
 	k8sClient, err := NewK8sClient()
 	if err != nil {
 		return err
 	}
-	pvs, err := k8sClient.clientset.CoreV1().PersistentVolumes().List(metav1.ListOptions{})
-	storageQuantity1Gi, _ := resource.ParseQuantity("1Gi")
+
+	pv, err := k8sClient.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
+	if err != nil {
+		log.Printf("Error getting PV %v", err)
+	}
+	// if found, no need to create the PV
+	if pv != nil {
+		return nil
+	}
+	storageQuantity, _ := resource.ParseQuantity(pvCapacity)
 	hostPath, err := MakeHostDirForPv(pvName)
 	if err != nil {
 		log.Printf("Error creating directory %s for PV, error %v", hostPath, err)
 		return err
 	}
-	//	namespace, err := k8sClient.clientset.CoreV1().Namespaces().Get(namespace, metav1.GetOptions{})
+
 	k8sexpVolume := &api.PersistentVolume{
 		TypeMeta: metav1.TypeMeta{Kind: "PersistentVolume",
 			APIVersion: "v1"},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:   pvName,
-			Labels: map[string]string{"type": "local"},
+			Labels: map[string]string{"tag": "apihub"},
 		},
 		Spec: api.PersistentVolumeSpec{
 			Capacity: api.ResourceList{
-				api.ResourceStorage: storageQuantity1Gi,
+				api.ResourceStorage: storageQuantity,
 			},
 			PersistentVolumeSource: api.PersistentVolumeSource{
 				HostPath: &api.HostPathVolumeSource{
@@ -130,16 +125,9 @@ func AddPV() error {
 		},
 		Status: api.PersistentVolumeStatus{},
 	}
-	_, err = k8sClient.clientset.CoreV1().PersistentVolumes().Create(k8sexpVolume)
+	_, err = k8sClient.CoreV1().PersistentVolumes().Create(k8sexpVolume)
 	if err != nil {
 		log.Print(err.Error())
-	}
-	log.Printf("Found %d pvs", len(pvs.Items))
-	for _, pv := range pvs.Items {
-		for key, label := range pv.Labels {
-			fmt.Printf("%s: %s\n", key, label)
-		}
-		print(pv.Spec.HostPath.Path)
 	}
 	return nil
 }
