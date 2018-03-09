@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jupyter-notebook
+  namespace: default
+  labels:
+    name: jupyter-notebook
+spec:
+  # type: NodePort  # enable this to debug
+  ports:
+    - port: 8888
+      targetPort: 8888
+  selector:
+    name: jupyter-notebook
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  namespace: default
+  labels:
+    name: jupyter-notebook
+  name: jupyter-notebook
+spec:
+  replicas: 1
+  selector:
+    name: jupyter-notebook
+  template:
+    metadata:
+      labels:
+        name: jupyter-notebook
+    spec:
+      containers:
+        - name: jupyter-notebook
+          image: jupyter/minimal-notebook:latest
+          args:
+            - start-notebook.sh
+            - --NotebookApp.base_url='/notebook/'
+            - --NotebookApp.token='mytoken'
+            - --NotebookApp.allow_origin='*'
+          ports:
+            - name: http
+              containerPort: 8888
+          volumeMounts:
+            - mountPath: /work
+              name: docker-distributed-repo
+      volumes:
+        - name: docker-distributed-repo
+          hostPath:
+            # use non-hostPath volumes in production
+            # directory location on host
+            path: /opt
+            # this field is optional
+            type: Directory

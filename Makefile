@@ -4,3 +4,4 @@ build:
 test:
 	go test github.com/codemk8/apihub/pkg/k8s
 	go test github.com/codemk8/apihub/pkg/helm
+	go test github.com/codemk8/apihub/pkg/kongclient
