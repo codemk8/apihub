@@ -17,6 +17,13 @@ type KongParams struct {
 	GwPort      string
 }
 
+// DeployParams receives flags from command line
+type DeployParams struct {
+	Uris  string
+	Force bool
+	Name  string
+}
+
 // KongK8sClient sends API request to kong service in k8s
 type KongK8sClient struct {
 	K8sCs       *kubernetes.Clientset

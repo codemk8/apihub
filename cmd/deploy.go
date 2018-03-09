@@ -21,6 +21,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	uris  string
+	force bool
+	name  string
+)
+
 // deployCmd represents the deploy command
 var deployCmd = &cobra.Command{
 	Use:   "deploy",
@@ -36,8 +42,15 @@ to quickly create a Cobra application.`,
 			fmt.Println("Please specify at least one service name to deploy.")
 			return
 		}
-		kongclient.Deploy(args)
-		fmt.Println("deploy called")
+		params := &kongclient.DeployParams{
+			Uris:  uris,
+			Force: force,
+			Name:  name,
+		}
+		ok := kongclient.Deploy(args, params)
+		if ok {
+			fmt.Printf("Deploy successfully")
+		}
 	},
 }
 
@@ -53,4 +66,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// deployCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	deployCmd.Flags().StringVarP(&uris, "uris", "u", "/", "path to the API gateway")
+	deployCmd.Flags().StringVarP(&name, "name", "n", "", "API name")
+	deployCmd.Flags().BoolVarP(&force, "force", "f", false, "Force to delete existing ones")
 }

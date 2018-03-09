@@ -1,3 +1,8 @@
+// Copyright (c) 2018 Code M
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
 package k8s
 
 import (
