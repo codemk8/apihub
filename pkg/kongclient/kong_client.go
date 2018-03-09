@@ -25,8 +25,8 @@ func parseNsAndSvc(svc string) (namespace string, service string, ok bool) {
 }
 
 // https://${external_url}:${kong_admin_port}/apis
-func (kc *KongK8sClient) constructKongAPIUrl() string {
-	return "https://" + kc.KongSvcHost + ":" + kc.KongSvcPort + "/apis"
+func (kc *KongK8sClient) constructKongAPIUrl(path string) string {
+	return "https://" + kc.KongSvcHost + ":" + kc.KongSvcPort + "/apis" + path
 }
 
 // RegisterServiceToKong adds an API endpoint to kong API
@@ -62,7 +62,12 @@ func Deploy(args []string, deployParams *DeployParams) bool {
 		return false
 	}
 	initResty()
-
+	response, err := resty.R().Get(kong.constructKongAPIUrl("/"))
+	if err != nil {
+		fmt.Printf("Wrong kong configuration %v", err)
+	} else {
+		fmt.Println(response.Body())
+	}
 	for _, service := range args {
 		kong.RegisterServiceToKong(service)
 	}
