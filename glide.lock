@@ -1,5 +1,5 @@
-hash: b4cad6fbde33c2b9e1735ecbce95a5deffb456d4c9c84dc0b227edc78e0ea713
-updated: 2018-03-09T18:46:48.35028471+08:00
+hash: e7a0222c09b0c17dbfb662f99a6a7a928f7c1bab8f7148485af0e7bd5663058c
+updated: 2018-03-10T00:08:50.767942398+08:00
 imports:
 - name: github.com/emicklei/go-restful
   version: ff4f55a206334ef123e4f79bbf348980da81ca46
@@ -17,6 +17,8 @@ imports:
   version: 7abd5745472fff5eb3685386d5fb8bf38683154d
 - name: github.com/go-openapi/swag
   version: f3f9494671f93fcff853e3c6e9e948b3eb71e590
+- name: github.com/go-resty/resty
+  version: 65798e030a35b911602b4d1d743d6f50ac93b665
 - name: github.com/gogo/protobuf
   version: c0656edd0d9eab7c66d1eb0c568f9039345796f7
   subpackages:
@@ -116,6 +118,7 @@ imports:
   - http2/hpack
   - idna
   - lex/httplex
+  - publicsuffix
 - name: golang.org/x/sys
   version: 95c6576299259db960f6c5b9b69ea52422860fce
   subpackages:
