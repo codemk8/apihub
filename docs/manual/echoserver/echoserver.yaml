@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: echoserver
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: http-echoserver
+    spec:
+      containers:
+      - name: http-echoserver
+        image: mirrorgooglecontainers/echoserver:1.8
+        ports:
+        - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: http-echoserver
+  labels:
+    app: http-echoserver
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: http-echoserver

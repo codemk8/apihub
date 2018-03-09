@@ -30,11 +30,11 @@ func Repo(subcmd string) error {
 }
 
 // Install runs "helm install ..." command
-func Install(chartName string) error {
-	cmd := exec.Command("helm", "install", chartName)
+func Install(chartName string, releaseName string) error {
+	cmd := exec.Command("helm", "install", chartName, "--name="+releaseName)
 	stdoutStderr, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("error install release %s:%v:\n", "--name="+chartName, err)
 	}
 	fmt.Printf("%s\n", stdoutStderr)
 	return err

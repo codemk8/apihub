@@ -22,14 +22,15 @@ const (
 )
 
 const (
-	pvCapacity = "2Gi"
+	// PvDefaultCapacity defines default PV capacity
+	PvDefaultCapacity = "8Gi"
 )
 
 // MakeHostDirForPv makes a directory for hostPath PV
 // For single-node cluster only
 func MakeHostDirForPv(pvName string) (string, error) {
 	home, _ := homedir.Dir()
-	path := filepath.Join(home, ".apihub", "pvs")
+	path := filepath.Join(home, ".apihub", "pvs", pvName)
 	err := os.MkdirAll(path, 0755)
 	return path, err
 }
@@ -93,7 +94,7 @@ func AddPV() error {
 		log.Printf("Found existing PV %s, skip creating...", pvName)
 		return nil
 	}
-	storageQuantity, _ := resource.ParseQuantity(pvCapacity)
+	storageQuantity, _ := resource.ParseQuantity(PvDefaultCapacity)
 	hostPath, err := MakeHostDirForPv(pvName)
 	if err != nil {
 		log.Printf("Error creating directory %s for PV, error %v", hostPath, err)
@@ -128,7 +129,7 @@ func AddPV() error {
 	if err != nil {
 		log.Print(err.Error())
 	}
-	return nil
+	return err
 }
 
 // DestroyPV deletes the persistent volumes created by apihub
