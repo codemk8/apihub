@@ -2,6 +2,7 @@ package kongclient
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/codemk8/apihub/pkg/k8s"
 )
@@ -11,14 +12,19 @@ func parseNsAndSvc(svc string) (namespace string, service string, ok bool) {
 	if svc == "" {
 		return "", "", false
 	}
-	//pairs := strings.Split(svc, ":")
-	return "", "", false
+	if strings.Contains(svc, ":") {
+		pairs := strings.Split(svc, ":")
+		if pairs[1] == "" {
+			return "", "", false
+		}
+		return pairs[0], pairs[1], true
+	}
+	return "default", svc, true
 }
 
 // RegisterServiceToKong adds an API endpoint to kong API
 func (kc *KongK8sClient) RegisterServiceToKong(svc string) bool {
 	// TODO
-	fmt.Printf("registering %s\n", svc)
 	clusterIPs := k8s.GetServiceClusterIPPort("default", svc, kc.K8sCs)
 	fmt.Println(clusterIPs)
 	return true
