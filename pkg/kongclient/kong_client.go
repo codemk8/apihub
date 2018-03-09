@@ -24,9 +24,16 @@ func parseNsAndSvc(svc string) (namespace string, service string, ok bool) {
 
 // RegisterServiceToKong adds an API endpoint to kong API
 func (kc *KongK8sClient) RegisterServiceToKong(svc string) bool {
-	// TODO
-	clusterIPs := k8s.GetServiceClusterIPPort("default", svc, kc.K8sCs)
-	fmt.Println(clusterIPs)
+	ns, svcName, ok := parseNsAndSvc(svc)
+	if !ok {
+		fmt.Printf("Error parsing service name :%s\n", svc)
+		return ok
+	}
+	clusterIPs := k8s.GetServiceClusterIPPort(ns, svcName, kc.K8sCs)
+	if len(clusterIPs) == 0 {
+		fmt.Printf("Could not find any clusterIPs for service %s", svc)
+		return false
+	}
 	return true
 }
 
