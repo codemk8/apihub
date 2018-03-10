@@ -7,6 +7,9 @@ import (
 	"os/exec"
 )
 
+// Disclaimer: This is just a quick/dirty way to communicate with tiller using helm cmd tool
+// A more "programmatic" way is to use the tiller's grpc interface
+
 // ListRelease list the running chart releases
 func ListRelease() error {
 	cmd := exec.Command("helm", "list")

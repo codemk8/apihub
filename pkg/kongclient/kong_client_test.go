@@ -1,12 +1,10 @@
 package kongclient
 
 import (
-	"encoding/json"
 	"fmt"
 	"testing"
 
 	"github.com/codemk8/apihub/pkg/k8s"
-	"github.com/go-resty/resty"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -48,22 +46,13 @@ func TestGetKubernetesCluterIP(t *testing.T) {
 	// default:kubernetes always has a 443 clusterIP
 	assert.Equal(t, int32(443), clusterIPs[0])
 }
+
 func TestNewKongClient(t *testing.T) {
 	kong := createKongClient()
 	assert.Equal(t, "localhost", kong.KongSvcHost)
-	initResty()
-	response, err := resty.R().Get(kong.constructKongAPIUrl("/"))
-	if err != nil {
-		fmt.Printf("Wrong kong configuration %v", err)
-	} else {
-		resp := KongGetResp{}
-		err := json.Unmarshal(response.Body(), &resp)
-		if err != nil {
-			fmt.Printf("Error parsing returned json %v", err)
-		} else {
-			fmt.Println(resp)
-		}
-	}
+	total, err := kong.SmokeTestKong()
+	fmt.Printf("Found %d existing APIs in Kong\n", total)
+	assert.Equal(t, nil, err)
 }
 
 func TestRegisterServiceToKong(t *testing.T) {

@@ -35,6 +35,7 @@ type KongK8sClient struct {
 
 // NewKongK8sClient creates a new KongK8sClient
 func NewKongK8sClient(kongParams KongParams) *KongK8sClient {
+	initResty()
 	client, err := k8s.NewK8sClient()
 	if err != nil {
 		log.Printf("Error init k8s client: %v", err)

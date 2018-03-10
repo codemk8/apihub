@@ -24,6 +24,7 @@ type KongAPISpec struct {
 	CreatedAt    int64  `json:"-"`
 	UpstreamURL  string `json:"upstream_url,omitempty"`
 	PreserveHost bool   `json:"preserve_host"`
+
 	// kong 0.9.x and earlier
 	RequestPath      string `json:"request_path,omitempty"`
 	RequestHost      string `json:"request_host,omitempty"`
@@ -32,4 +33,11 @@ type KongAPISpec struct {
 	Hosts    []string `json:"hosts,omitempty"`
 	Uris     []string `json:"uris,omitempty"`
 	StripURI bool     `json:"strip_uri,omitempty"`
+	// Even newer versions
+	HTTPSOnly           bool  `json:"https_only,omitempty"`
+	HTTPIfTerminated    bool  `json:"http_if_terminated,omitempty"`
+	UpstreamConTimeout  int64 `json:"upstream_connect_timeout,omitempty"`
+	UpstreamReadTimeout int64 `json:"upstream_read_timeout,omitempty"`
+	UpstreamSendTimeout int64 `json:"upstream_send_timeout,omitempty"`
+	Retries             int64 `json:"retries,omitempty"`
 }

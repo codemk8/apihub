@@ -2,6 +2,7 @@ package kongclient
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -50,6 +51,22 @@ func initResty() {
 	resty.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 }
 
+// SmokeTestKong calls a simple API on kong admin
+func (kc *KongK8sClient) SmokeTestKong() (int, error) {
+	response, err := resty.R().Get(kc.constructKongAPIUrl("/"))
+	if err != nil {
+		fmt.Printf("Error calling GET on Kong admin: %v", err)
+		return 0, err
+	}
+	APIResult := KongGetResp{}
+	err = json.Unmarshal(response.Body(), &APIResult)
+	if err != nil {
+		fmt.Printf("Error unmarshalling response: %v", err)
+		return 0, err
+	}
+	return APIResult.Total, nil
+}
+
 // Deploy implements the "deploy" command
 func Deploy(args []string, deployParams *DeployParams) bool {
 	// TODO set params from cached values
@@ -60,13 +77,6 @@ func Deploy(args []string, deployParams *DeployParams) bool {
 	if kong == nil {
 		fmt.Println("Error init API gateway client, check if kong is a valid service in k8s.")
 		return false
-	}
-	initResty()
-	response, err := resty.R().Get(kong.constructKongAPIUrl("/"))
-	if err != nil {
-		fmt.Printf("Wrong kong configuration %v", err)
-	} else {
-		fmt.Println(response.Body())
 	}
 	for _, service := range args {
 		kong.RegisterServiceToKong(service)
