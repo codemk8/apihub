@@ -51,6 +51,34 @@ func initResty() {
 	resty.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 }
 
+// PostNewAPI tries to add a new API to kong
+func (kc *KongK8sClient) PutNewAPI() (int, error) {
+	req := KongPutAPISpec{
+		Name:        "http-echoserver",
+		UpstreamURL: "http://http-echoserver:80",
+		URIs:        "/http-echoserver",
+		StripURI:    false,
+	}
+	body, _ := json.Marshal(&req)
+	response, err := resty.R().SetHeader("Content-Type", "application/json").
+		SetBody(body).Put(kc.constructKongAPIUrl("/"))
+	if err != nil {
+		fmt.Printf("Error Put API to kong: %+v", err)
+		return 0, err
+	}
+	APISpec := KongAPISpec{}
+	err = json.Unmarshal(response.Body(), &APISpec)
+	if err != nil {
+		fmt.Printf("Error unmarshalling response: %v", err)
+		return 0, err
+	}
+	// Expecting http.StatusOK(200) or http.StatusCreated(201) code
+	// Or http.StatusConflict(409) if there is conflict
+	fmt.Printf("Return code %d\n", response.StatusCode())
+	fmt.Printf("Response: %+v\n", APISpec)
+	return response.StatusCode(), err
+}
+
 // SmokeTestKong calls a simple API on kong admin
 func (kc *KongK8sClient) SmokeTestKong() (int, error) {
 	response, err := resty.R().Get(kc.constructKongAPIUrl("/"))

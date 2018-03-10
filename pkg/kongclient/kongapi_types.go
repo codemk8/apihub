@@ -41,3 +41,11 @@ type KongAPISpec struct {
 	UpstreamSendTimeout int64 `json:"upstream_send_timeout,omitempty"`
 	Retries             int64 `json:"retries,omitempty"`
 }
+
+// KongPutAPISpec defines new API spec to add a new API to kong
+type KongPutAPISpec struct {
+	Name        string `json:"name"`
+	UpstreamURL string `json:"upstream_url"`
+	URIs        string `json:"uris"`
+	StripURI    bool   `json:"strip_uri"`
+}

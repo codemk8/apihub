@@ -59,3 +59,8 @@ func TestRegisterServiceToKong(t *testing.T) {
 	kong := createKongClient()
 	kong.RegisterServiceToKong("default:http-echoserver")
 }
+
+func TestPutAPIToKong(t *testing.T) {
+	kong := createKongClient()
+	kong.PutNewAPI()
+}
