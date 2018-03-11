@@ -13,11 +13,7 @@ type KongGetResp struct {
 	Data  []KongAPISpec `json:"data,omitempty"`
 }
 
-// "POST /apis/"
-
-// TODO: there are more fields in recent releases
-
-// KongAPISpec defines the request format for "POST /apis/"
+// KongAPISpec defines the request json format for "POST /apis/"
 type KongAPISpec struct {
 	ID           string `json:"id,omitempty"`
 	Name         string `json:"name"`
@@ -33,7 +29,7 @@ type KongAPISpec struct {
 	Hosts    []string `json:"hosts,omitempty"`
 	Uris     []string `json:"uris,omitempty"`
 	StripURI bool     `json:"strip_uri,omitempty"`
-	// Even newer versions
+	// kong 0.12 x versions
 	HTTPSOnly           bool  `json:"https_only,omitempty"`
 	HTTPIfTerminated    bool  `json:"http_if_terminated,omitempty"`
 	UpstreamConTimeout  int64 `json:"upstream_connect_timeout,omitempty"`
@@ -42,10 +38,22 @@ type KongAPISpec struct {
 	Retries             int64 `json:"retries,omitempty"`
 }
 
-// KongPutAPISpec defines new API spec to add a new API to kong
+// KongPutAPISpec defines request json format for "PUT /apis/"
 type KongPutAPISpec struct {
 	Name        string `json:"name"`
 	UpstreamURL string `json:"upstream_url"`
-	URIs        string `json:"uris"`
-	StripURI    bool   `json:"strip_uri"`
+
+	// At least one of Hosts/URIs/Methods should be specified
+	Hosts        string `json:"hosts,omitempty"`
+	URIs         string `json:"uris,omitempty"`
+	Methods      string `json:"methods,omitempty"`
+	PreserveHost bool   `json:"preserve_host"`
+	StripURI     bool   `json:"strip_uri,omitempty"` // default true
+
+	HTTPSOnly           bool  `json:"https_only,omitempty"`
+	HTTPIfTerminated    bool  `json:"http_if_terminated,omitempty"`
+	UpstreamConTimeout  int64 `json:"upstream_connect_timeout,omitempty"`
+	UpstreamReadTimeout int64 `json:"upstream_read_timeout,omitempty"`
+	UpstreamSendTimeout int64 `json:"upstream_send_timeout,omitempty"`
+	Retries             int64 `json:"retries,omitempty"`
 }

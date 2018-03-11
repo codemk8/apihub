@@ -4,11 +4,16 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/codemk8/apihub/pkg/k8s"
 	"github.com/go-resty/resty"
 )
+
+func initResty() {
+	resty.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
+}
 
 // parse "default:service_name" into pair of (default(namespace), service_name)
 func parseNsAndSvc(svc string) (namespace string, service string, ok bool) {
@@ -27,11 +32,11 @@ func parseNsAndSvc(svc string) (namespace string, service string, ok bool) {
 
 // https://${external_url}:${kong_admin_port}/apis
 func (kc *KongK8sClient) constructKongAPIUrl(path string) string {
-	return "https://" + kc.KongSvcHost + ":" + kc.KongSvcPort + "/apis" + path
+	return "https://" + kc.KongSvcHost + ":" + kc.KongSvcPort + path
 }
 
 // RegisterServiceToKong adds an API endpoint to kong API
-func (kc *KongK8sClient) RegisterServiceToKong(svc string) bool {
+func (kc *KongK8sClient) RegisterServiceToKong(svc string, deployParams *DeployParams) bool {
 	ns, svcName, ok := parseNsAndSvc(svc)
 	if !ok {
 		fmt.Printf("Error parsing service name :%s\n", svc)
@@ -42,26 +47,19 @@ func (kc *KongK8sClient) RegisterServiceToKong(svc string) bool {
 		fmt.Printf("Could not find any clusterIPs for service %s", svc)
 		return false
 	}
+	if len(clusterIPs) > 1 {
+		fmt.Printf("Found multiple clusterIPs for service %s, trying to add the first port %d.", svc, clusterIPs[0])
+	}
 	// Only register the first port now
 
 	return true
 }
 
-func initResty() {
-	resty.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
-}
-
 // PutNewAPI tries to add a new API to kong
-func (kc *KongK8sClient) PutNewAPI() (int, error) {
-	req := KongPutAPISpec{
-		Name:        "http-echoserver",
-		UpstreamURL: "http://http-echoserver:80",
-		URIs:        "/http-echoserver",
-		StripURI:    false,
-	}
-	body, _ := json.Marshal(&req)
+func (kc *KongK8sClient) PutNewAPI(req *KongPutAPISpec) (int, error) {
+	body, _ := json.Marshal(req)
 	response, err := resty.R().SetHeader("Content-Type", "application/json").
-		SetBody(body).Put(kc.constructKongAPIUrl("/"))
+		SetBody(body).Put(kc.constructKongAPIUrl("/apis/"))
 	if err != nil {
 		fmt.Printf("Error Put API to kong: %+v", err)
 		return 0, err
@@ -74,16 +72,13 @@ func (kc *KongK8sClient) PutNewAPI() (int, error) {
 	}
 	// Expecting http.StatusOK(200) or http.StatusCreated(201) code
 	// Or http.StatusConflict(409) if there is conflict
-	fmt.Printf("Return code %d\n", response.StatusCode())
-	fmt.Printf("Response: %+v\n", APISpec)
 	return response.StatusCode(), err
 }
 
 // DeleteAPI tries to add a new API to kong
 func (kc *KongK8sClient) DeleteAPI(name string) (int, error) {
-	response, err := resty.R().Delete(kc.constructKongAPIUrl("/" + name))
+	response, err := resty.R().Delete(kc.constructKongAPIUrl("/apis/" + name))
 	// Expecting http.StatsNoContent (204)
-	fmt.Printf("Return code %d\n", response.StatusCode())
 	return response.StatusCode(), err
 }
 
@@ -104,7 +99,7 @@ func (kc *KongK8sClient) SmokeTestKong() (int, error) {
 }
 
 // Deploy implements the "deploy" command
-func Deploy(args []string, deployParams *DeployParams) bool {
+func Deploy(service string, deployParams *DeployParams) bool {
 	// TODO set params from cached values
 	// use default now
 	params := KongParams{}
@@ -114,8 +109,25 @@ func Deploy(args []string, deployParams *DeployParams) bool {
 		fmt.Println("Error init API gateway client, check if kong is a valid service in k8s.")
 		return false
 	}
-	for _, service := range args {
-		kong.RegisterServiceToKong(service)
+	return kong.RegisterServiceToKong(service, deployParams)
+}
+
+func makeUpstreamURL(serverName string, port int32, subpath string) string {
+	// Hardcode to http for now
+	if subpath == "" {
+		return "http://" + serverName + ":" + strconv.Itoa(int(port)) + "/"
 	}
-	return true
+	return "http://" + serverName + ":" + strconv.Itoa(int(port)) + subpath
+}
+
+func makePutParams(deploy *DeployParams, service string) *KongPutAPISpec {
+	putSpec := &KongPutAPISpec{
+		Name:     deploy.Name,
+		StripURI: deploy.StripURI,
+	}
+	if deploy.Name == "" {
+		putSpec.Name = service
+	}
+
+	return putSpec
 }

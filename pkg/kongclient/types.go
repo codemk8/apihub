@@ -19,9 +19,10 @@ type KongParams struct {
 
 // DeployParams receives flags from command line
 type DeployParams struct {
-	Uris  string
-	Force bool
-	Name  string
+	Uris     string
+	Force    bool
+	Name     string
+	StripURI bool
 }
 
 // KongK8sClient sends API request to kong service in k8s

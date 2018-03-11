@@ -22,9 +22,11 @@ import (
 )
 
 var (
-	uris  string
-	force bool
-	name  string
+	name     string
+	uris     string
+	force    bool
+	stripURI bool
+	subPath  string
 )
 
 // deployCmd represents the deploy command
@@ -38,16 +40,17 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) < 1 {
-			fmt.Println("Please specify at least one service name to deploy.")
+		if len(args) != 1 {
+			fmt.Println("Please specify one service name to deploy.")
 			return
 		}
 		params := &kongclient.DeployParams{
-			Uris:  uris,
-			Force: force,
-			Name:  name,
+			Uris:     uris,
+			Force:    force,
+			Name:     name,
+			StripURI: stripURI,
 		}
-		ok := kongclient.Deploy(args, params)
+		ok := kongclient.Deploy(args[0], params)
 		if ok {
 			fmt.Printf("Deploy successfully")
 		}
@@ -68,5 +71,7 @@ func init() {
 	// deployCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	deployCmd.Flags().StringVarP(&uris, "uris", "u", "/", "path to the API gateway")
 	deployCmd.Flags().StringVarP(&name, "name", "n", "", "API name")
+	deployCmd.Flags().StringVarP(&subPath, "subpath", "p", "", "Subpath after the service name, e.g. http://myapi/api/v1 needs to specify subpath as \"api/v1\"")
 	deployCmd.Flags().BoolVarP(&force, "force", "f", false, "Force to delete existing ones")
+	deployCmd.Flags().BoolVarP(&stripURI, "strip", "s", true, "Strip the matching prefix from the upstream URI")
 }
