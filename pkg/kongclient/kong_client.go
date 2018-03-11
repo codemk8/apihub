@@ -51,7 +51,7 @@ func initResty() {
 	resty.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 }
 
-// PostNewAPI tries to add a new API to kong
+// PutNewAPI tries to add a new API to kong
 func (kc *KongK8sClient) PutNewAPI() (int, error) {
 	req := KongPutAPISpec{
 		Name:        "http-echoserver",
@@ -76,6 +76,14 @@ func (kc *KongK8sClient) PutNewAPI() (int, error) {
 	// Or http.StatusConflict(409) if there is conflict
 	fmt.Printf("Return code %d\n", response.StatusCode())
 	fmt.Printf("Response: %+v\n", APISpec)
+	return response.StatusCode(), err
+}
+
+// DeleteAPI tries to add a new API to kong
+func (kc *KongK8sClient) DeleteAPI(name string) (int, error) {
+	response, err := resty.R().Delete(kc.constructKongAPIUrl("/" + name))
+	// Expecting http.StatsNoContent (204)
+	fmt.Printf("Return code %d\n", response.StatusCode())
 	return response.StatusCode(), err
 }
 

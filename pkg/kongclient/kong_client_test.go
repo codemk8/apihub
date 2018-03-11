@@ -2,7 +2,9 @@ package kongclient
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
+	"time"
 
 	"github.com/codemk8/apihub/pkg/k8s"
 	"github.com/stretchr/testify/assert"
@@ -63,4 +65,8 @@ func TestRegisterServiceToKong(t *testing.T) {
 func TestPutAPIToKong(t *testing.T) {
 	kong := createKongClient()
 	kong.PutNewAPI()
+	time.Sleep(10 * time.Millisecond)
+	code, err := kong.DeleteAPI("http-echoserver")
+	assert.Equal(t, http.StatusNoContent, code)
+	assert.Equal(t, nil, err)
 }
