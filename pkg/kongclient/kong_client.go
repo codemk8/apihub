@@ -92,20 +92,29 @@ func (kc *KongK8sClient) DeleteAPI(name string) (int, error) {
 	return response.StatusCode(), err
 }
 
-// SmokeTestKong calls a simple API on kong admin
-func (kc *KongK8sClient) SmokeTestKong() (int, error) {
-	response, err := resty.R().Get(kc.makeKongAPIURL("/"))
+// ListAPIs list APIs in the kongxisting
+func (kc *KongK8sClient) ListAPIs() *KongGetResp {
+	response, err := resty.R().Get(kc.makeKongAPIURL("/apis/"))
 	if err != nil {
-		fmt.Printf("Error calling GET on Kong admin: %v", err)
-		return 0, err
+		log.Printf("Error calling GET on Kong admin: %v", err)
+		return nil
 	}
 	APIResult := KongGetResp{}
 	err = json.Unmarshal(response.Body(), &APIResult)
 	if err != nil {
-		fmt.Printf("Error unmarshalling response: %v", err)
-		return 0, err
+		log.Printf("Error unmarshalling response: %v", err)
+		return nil
 	}
-	return APIResult.Total, nil
+	return &APIResult
+}
+
+// SmokeTestKong calls a simple API on kong admin
+func (kc *KongK8sClient) SmokeTestKong() int {
+	resp := kc.ListAPIs()
+	if resp != nil {
+		return resp.Total
+	}
+	return -1
 }
 
 func makeUpstreamURL(serverName string, port int32, subpath string) string {

@@ -51,9 +51,11 @@ func TestGetKubernetesCluterIP(t *testing.T) {
 func TestNewKongClient(t *testing.T) {
 	kong := createKongClient()
 	assert.Equal(t, "localhost", kong.KongSvcHost)
-	total, err := kong.SmokeTestKong()
-	fmt.Printf("Found %d existing APIs in Kong\n", total)
-	assert.Equal(t, nil, err)
+	total := kong.SmokeTestKong()
+	assert.True(t, total >= 0)
+	if total >= 0 {
+		fmt.Printf("Found %d existing APIs in Kong\n", total)
+	}
 }
 
 func TestRegisterServiceToKong(t *testing.T) {
