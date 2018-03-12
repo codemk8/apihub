@@ -1,5 +1,5 @@
-hash: e7a0222c09b0c17dbfb662f99a6a7a928f7c1bab8f7148485af0e7bd5663058c
-updated: 2018-03-10T00:08:50.767942398+08:00
+hash: 0798a148ffacd7a815dcd0f7c03b00da1b9ea3884743e4df2b03ac998ec78e12
+updated: 2018-03-12T23:10:59.666759355+08:00
 imports:
 - name: github.com/emicklei/go-restful
   version: ff4f55a206334ef123e4f79bbf348980da81ca46
@@ -81,6 +81,8 @@ imports:
   version: b8bc1bf767474819792c23f32d8286a45736f1c6
 - name: github.com/mitchellh/mapstructure
   version: 00c29f56e2386353d58c599509e8dc3801b0d716
+- name: github.com/olekukonko/tablewriter
+  version: b8a9be070da40449e501c3c4730a889e42d87a9e
 - name: github.com/pelletier/go-toml
   version: acdc4509485b587f5e675510c4f2c63e90ff68a8
 - name: github.com/peterbourgon/diskv

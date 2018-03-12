@@ -22,3 +22,4 @@ import:
   - assert
 - package: github.com/go-resty/resty
   version: ^1.3.0
+- package: github.com/olekukonko/tablewriter
