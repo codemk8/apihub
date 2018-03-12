@@ -22,6 +22,7 @@ type DeployParams struct {
 	Uris     string
 	Force    bool
 	Name     string
+	SvcRoot  string
 	StripURI bool
 }
 

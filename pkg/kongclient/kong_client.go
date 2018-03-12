@@ -4,6 +4,8 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -31,7 +33,7 @@ func parseNsAndSvc(svc string) (namespace string, service string, ok bool) {
 }
 
 // https://${external_url}:${kong_admin_port}/apis
-func (kc *KongK8sClient) constructKongAPIUrl(path string) string {
+func (kc *KongK8sClient) makeKongAPIURL(path string) string {
 	return "https://" + kc.KongSvcHost + ":" + kc.KongSvcPort + path
 }
 
@@ -51,15 +53,23 @@ func (kc *KongK8sClient) RegisterServiceToKong(svc string, deployParams *DeployP
 		fmt.Printf("Found multiple clusterIPs for service %s, trying to add the first port %d.", svc, clusterIPs[0])
 	}
 	// Only register the first port now
-
-	return true
+	putSpec := makePutParams(deployParams, svc, clusterIPs[0])
+	code, err := kc.PutNewAPI(putSpec)
+	if err != nil {
+		log.Printf("Error put new API %v", err)
+	}
+	if code == http.StatusOK || code == http.StatusCreated {
+		return true
+	}
+	log.Printf("Put API receive error code %d", code)
+	return false
 }
 
 // PutNewAPI tries to add a new API to kong
 func (kc *KongK8sClient) PutNewAPI(req *KongPutAPISpec) (int, error) {
 	body, _ := json.Marshal(req)
 	response, err := resty.R().SetHeader("Content-Type", "application/json").
-		SetBody(body).Put(kc.constructKongAPIUrl("/apis/"))
+		SetBody(body).Put(kc.makeKongAPIURL("/apis/"))
 	if err != nil {
 		fmt.Printf("Error Put API to kong: %+v", err)
 		return 0, err
@@ -77,14 +87,14 @@ func (kc *KongK8sClient) PutNewAPI(req *KongPutAPISpec) (int, error) {
 
 // DeleteAPI tries to add a new API to kong
 func (kc *KongK8sClient) DeleteAPI(name string) (int, error) {
-	response, err := resty.R().Delete(kc.constructKongAPIUrl("/apis/" + name))
+	response, err := resty.R().Delete(kc.makeKongAPIURL("/apis/" + name))
 	// Expecting http.StatsNoContent (204)
 	return response.StatusCode(), err
 }
 
 // SmokeTestKong calls a simple API on kong admin
 func (kc *KongK8sClient) SmokeTestKong() (int, error) {
-	response, err := resty.R().Get(kc.constructKongAPIUrl("/"))
+	response, err := resty.R().Get(kc.makeKongAPIURL("/"))
 	if err != nil {
 		fmt.Printf("Error calling GET on Kong admin: %v", err)
 		return 0, err
@@ -115,18 +125,42 @@ func Deploy(service string, deployParams *DeployParams) bool {
 func makeUpstreamURL(serverName string, port int32, subpath string) string {
 	// Hardcode to http for now
 	if subpath == "" {
-		return "http://" + serverName + ":" + strconv.Itoa(int(port)) + "/"
+		return "http://" + serverName + ":" + strconv.Itoa(int(port))
+	}
+	if subpath[0] != '/' {
+		return "http://" + serverName + ":" + strconv.Itoa(int(port)) + "/" + subpath
 	}
 	return "http://" + serverName + ":" + strconv.Itoa(int(port)) + subpath
 }
 
-func makePutParams(deploy *DeployParams, service string) *KongPutAPISpec {
+// make sure string are all ascii, which is important for uri
+func isASCII(s string) bool {
+	for _, c := range s {
+		if c > 127 {
+			return false
+		}
+	}
+	return true
+}
+
+func makePutParams(deploy *DeployParams, service string, port int32) *KongPutAPISpec {
 	putSpec := &KongPutAPISpec{
-		Name:     deploy.Name,
-		StripURI: deploy.StripURI,
+		Name:        deploy.Name,
+		StripURI:    deploy.StripURI,
+		UpstreamURL: makeUpstreamURL(service, port, deploy.SvcRoot),
+		URIs:        deploy.Uris,
+		Retries:     5,
 	}
 	if deploy.Name == "" {
 		putSpec.Name = service
+	}
+	// correct bad UIR input
+	// e.g. "myapi/v1/" to "myapi/v1"
+	if putSpec.URIs[0] != '/' {
+		putSpec.URIs = "/" + putSpec.URIs
+	}
+	if putSpec.URIs[len(putSpec.URIs)-1] == '/' {
+		putSpec.URIs = putSpec.URIs[0 : len(putSpec.URIs)-1]
 	}
 
 	return putSpec

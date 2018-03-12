@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/codemk8/apihub/pkg/kongclient"
 	"github.com/spf13/cobra"
@@ -26,7 +27,7 @@ var (
 	uris     string
 	force    bool
 	stripURI bool
-	subPath  string
+	svcRoot  string
 )
 
 // deployCmd represents the deploy command
@@ -48,11 +49,14 @@ to quickly create a Cobra application.`,
 			Uris:     uris,
 			Force:    force,
 			Name:     name,
+			SvcRoot:  svcRoot,
 			StripURI: stripURI,
 		}
 		ok := kongclient.Deploy(args[0], params)
 		if ok {
 			fmt.Printf("Deploy successfully")
+		} else {
+			log.Printf("Deploy was not successful")
 		}
 	},
 }
@@ -69,9 +73,9 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// deployCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	deployCmd.Flags().StringVarP(&uris, "uris", "u", "/", "path to the API gateway")
+	deployCmd.Flags().StringVarP(&uris, "uris", "u", "/", "subpath to the API gateway, e.g. '/myapi/v1'")
 	deployCmd.Flags().StringVarP(&name, "name", "n", "", "API name")
-	deployCmd.Flags().StringVarP(&subPath, "subpath", "p", "", "Subpath after the service name, e.g. http://myapi/api/v1 needs to specify subpath as \"api/v1\"")
+	deployCmd.Flags().StringVarP(&svcRoot, "root", "r", "", "root path to the service's API")
 	deployCmd.Flags().BoolVarP(&force, "force", "f", false, "Force to delete existing ones")
 	deployCmd.Flags().BoolVarP(&stripURI, "strip", "s", true, "Strip the matching prefix from the upstream URI")
 }
