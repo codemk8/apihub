@@ -14,7 +14,7 @@
             "host": "127.0.0.1",
             "program": "${fileDirname}",
             "env": {},
-            "args": [],
+            "args": ["deploy", "http-echoserver", "--name=echo", "--uris=echo/v1"],
             "showLog": true
         }
     ]

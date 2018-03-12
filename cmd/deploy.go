@@ -33,7 +33,7 @@ var (
 // deployCmd represents the deploy command
 var deployCmd = &cobra.Command{
 	Use:   "deploy",
-	Short: "A brief description of your command",
+	Short: "Deploy a k8s ClusterIP service to a API gateway for external access",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -54,9 +54,9 @@ to quickly create a Cobra application.`,
 		}
 		ok := kongclient.Deploy(args[0], params)
 		if ok {
-			fmt.Printf("Deploy successfully")
+			fmt.Println("Deploy successfully")
 		} else {
-			log.Printf("Deploy was not successful")
+			log.Println("Deploy was not successful")
 		}
 	},
 }

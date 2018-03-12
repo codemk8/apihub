@@ -44,17 +44,16 @@ type KongPutAPISpec struct {
 	UpstreamURL string `json:"upstream_url"`
 
 	// At least one of Hosts/URIs/Methods should be specified
-	//Hosts string `json:"hosts,omitempty"`
-	URIs string `json:"uris,omitempty"`
-	//Methods string `json:"methods,omitempty"`
-	//PreserveHost bool   `json:"preserve_host"`
-	StripURI bool `json:"strip_uri,omitempty"` // default true
-	/*
-		HTTPSOnly           bool  `json:"https_only,omitempty"`
-		HTTPIfTerminated    bool  `json:"http_if_terminated,omitempty"`
-		UpstreamConTimeout  int64 `json:"upstream_connect_timeout,omitempty"`
-		UpstreamReadTimeout int64 `json:"upstream_read_timeout,omitempty"`
-		UpstreamSendTimeout int64 `json:"upstream_send_timeout,omitempty"`
-	*/
+	Hosts               string `json:"hosts,omitempty"`
+	URIs                string `json:"uris,omitempty"`
+	Methods             string `json:"methods,omitempty"`
+	PreserveHost        bool   `json:"preserve_host"`
+	StripURI            bool   `json:"strip_uri,omitempty"` // default true
+	HTTPSOnly           bool   `json:"https_only,omitempty"`
+	HTTPIfTerminated    bool   `json:"http_if_terminated,omitempty"`
+	UpstreamConTimeout  int64  `json:"upstream_connect_timeout,omitempty"`
+	UpstreamReadTimeout int64  `json:"upstream_read_timeout,omitempty"`
+	UpstreamSendTimeout int64  `json:"upstream_send_timeout,omitempty"`
+
 	Retries int64 `json:"retries,omitempty"`
 }
