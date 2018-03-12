@@ -50,7 +50,7 @@ apihub-kong     1               Mon Mar 12 00:49:31 2018        DEPLOYED        
 NAME    URL
 stable  https://kubernetes-charts.storage.googleapis.com
 local   http://127.0.0.1:8879/charts
-# Then init the system, including persistent volumes, kong service
+# Then init the system, including persistent volumes (not fully supported yet), kong service
 $ ./bin/ap init
 ...
 # Deploy a clusterIP service in the kubernetes as you normally do with kubectl. Following example use echoserver:
