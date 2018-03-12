@@ -108,20 +108,6 @@ func (kc *KongK8sClient) SmokeTestKong() (int, error) {
 	return APIResult.Total, nil
 }
 
-// Deploy implements the "deploy" command
-func Deploy(service string, deployParams *DeployParams) bool {
-	// TODO set params from cached values
-	// use default now
-	params := KongParams{}
-	kong := NewKongK8sClient(params)
-
-	if kong == nil {
-		fmt.Println("Error init API gateway client, check if kong is a valid service in k8s.")
-		return false
-	}
-	return kong.RegisterServiceToKong(service, deployParams)
-}
-
 func makeUpstreamURL(serverName string, port int32, subpath string) string {
 	// Hardcode to http for now
 	if subpath == "" {

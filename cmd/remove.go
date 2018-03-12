@@ -15,15 +15,16 @@
 package cmd
 
 import (
-	"fmt"
+	"log"
 
+	"github.com/codemk8/apihub/pkg/kongclient"
 	"github.com/spf13/cobra"
 )
 
 // removeCmd represents the remove command
 var removeCmd = &cobra.Command{
 	Use:   "remove",
-	Short: "A brief description of your command",
+	Short: "Remove a list of APIs previously deployed.",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -31,7 +32,10 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("remove called")
+		ok := kongclient.Remove(args)
+		if ok {
+			log.Println("Successfully executed remove command.")
+		}
 	},
 }
 

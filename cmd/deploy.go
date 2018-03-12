@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/codemk8/apihub/pkg/kongclient"
@@ -42,7 +41,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) != 1 {
-			fmt.Println("Please specify one service name to deploy.")
+			log.Println("Please specify one service name to deploy.")
 			return
 		}
 		params := &kongclient.DeployParams{
@@ -54,9 +53,9 @@ to quickly create a Cobra application.`,
 		}
 		ok := kongclient.Deploy(args[0], params)
 		if ok {
-			fmt.Println("Deploy successfully")
+			log.Println("Successfully executed Deploy command.")
 		} else {
-			log.Println("Deploy was not successful")
+			log.Println("Warning: failed to execute Deploy command!")
 		}
 	},
 }
