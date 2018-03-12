@@ -15,8 +15,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"github.com/codemk8/apihub/pkg/helm"
@@ -35,7 +33,6 @@ It also checks other dependencies such as a tiller service`,
 		k8s.CheckK8s()
 		helm.ListRelease()
 		helm.Repo("list")
-		fmt.Println("check called")
 	},
 }
 
