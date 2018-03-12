@@ -1,5 +1,5 @@
 hash: 0798a148ffacd7a815dcd0f7c03b00da1b9ea3884743e4df2b03ac998ec78e12
-updated: 2018-03-12T23:10:59.666759355+08:00
+updated: 2018-03-12T23:17:41.28858156+08:00
 imports:
 - name: github.com/emicklei/go-restful
   version: ff4f55a206334ef123e4f79bbf348980da81ca46
@@ -77,6 +77,8 @@ imports:
   - buffer
   - jlexer
   - jwriter
+- name: github.com/mattn/go-runewidth
+  version: a9d6d1e4dc51df2130326793d49971f238839169
 - name: github.com/mitchellh/go-homedir
   version: b8bc1bf767474819792c23f32d8286a45736f1c6
 - name: github.com/mitchellh/mapstructure

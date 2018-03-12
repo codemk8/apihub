@@ -15,8 +15,6 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/codemk8/apihub/pkg/kongclient"
 	"github.com/codemk8/apihub/pkg/view"
 	"github.com/spf13/cobra"
@@ -34,8 +32,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		lists := kongclient.List()
-		log.Printf("%+v", lists)
-		view.TableView{}.View(lists)
+		view.NewTableView().View(lists)
 	},
 }
 
