@@ -71,10 +71,10 @@ $ ./bin/ap deploy http-echoserver --name=my_echo --uris=echo/v1
 $ curl -k http://localhost:32443/echo/v1
 ...
 
-# (Optional) Delete an exposed API
-$ ./bin/ap delete my_echo
+# (Optional) Remove an exposed API
+$ ./bin/ap remove my_echo
 
-# list APIs
+# list APIs 
 $ ./bin/ap list
 +---------+---------------------------+----------+----------+
 | NAME    |        UPSTREAMURL        | STRIPURI | URIS     |
