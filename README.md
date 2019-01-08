@@ -2,7 +2,7 @@
 
 **Deploy APIs Made Easy**
 
-## TO Answer
+## Objectives
 
 **apihub** is a thin layer on top of kubernetes cluster to expose and manage Restful-style microservices for external usage. It's major(or small) contribution is to easily add a restful API service to a API gateway ([kong](https://getkong.org) for now). Its usages include:
 
@@ -13,21 +13,21 @@
 
 ![compare](./docs/compare.png)
 
-## TO Boast
+## Features
 
 **apihub** features: 
 
 * A mordern Go CLI interface ([cobra](https://github.com/spf13/cobra/)) to wrap the raw kong API calls
 * Made it easy to take advantage of Kong's various plugins (authorization, rate limit) for Restful APIs.
 
-## TO Prepare
+## Setups
 
 We assume you already have:
 * A running kubernetes cluster
 * [Tiller](https://github.com/kubernetes/helm) is running as a service and local host has helm installed (TODO remove this requirement)
 * A bunch of restful docker images that you would like to serve, in an organized way
 
-## TO Build
+## Development
 
 ```bash
 # Make sure you have go tool
@@ -39,7 +39,7 @@ cd apihub
 make
 # It'll generate a bin/ap binary
 ```
-## TO Use
+## Walkthrough
 
 ```bash
 cd $GOPATH/src/github.com/codemk8/apihub
